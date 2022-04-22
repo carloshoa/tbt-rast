@@ -1,29 +1,28 @@
 import express from 'express';
 import dotenv from 'dotenv';
 
+import initMongoConnection from './database/mongodbConfig';
+
+import requestTrackingMiddleware from './middlewares/requestTracking';
+import errorHandlingMiddleware from './middlewares/errorHandling';
+import resourceNotFoundMiddleware from './middlewares/resourceNotFound';
+
 dotenv.config();
 const app = express();
+initMongoConnection();
 
-app.use((req, res, next) => {
-  console.log(`Receiving ${req.method} request to route ${req.path}`);
-  next();
-});
+app.use(requestTrackingMiddleware);
 
-app.get('/', (req, res, next) => {
-  try{
-    asdasdasd
+app.get('/tbt', (req, res, next) => {
+  try {
     res.json({ message: 'Hello TBT' });
   } catch (error) {
     next(error);
   }
 });
 
-app.use((err, req, res, next) => {
-  console.log(err);
+app.use(errorHandlingMiddleware);
+app.use(resourceNotFoundMiddleware);
 
-  res.status(err.status || 500).json({ message: err.message || 'A problem occured. Please try again later' });
-});
-
-app.use((req, res) => res.status(404).json({ message: `Resource "${req.method}" to "${req.path}" not found`}))
-
+// eslint-disable-next-line no-console
 app.listen(process.env.PORT, () => console.log(`App connected at PORT ${process.env.PORT}`));
