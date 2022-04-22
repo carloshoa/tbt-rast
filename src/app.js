@@ -3,23 +3,21 @@ import dotenv from 'dotenv';
 
 import initMongoConnection from './database/mongodbConfig';
 
+import appRoutes from './routes';
+
 import requestTrackingMiddleware from './middlewares/requestTracking';
 import errorHandlingMiddleware from './middlewares/errorHandling';
 import resourceNotFoundMiddleware from './middlewares/resourceNotFound';
 
 dotenv.config();
 const app = express();
+
 initMongoConnection();
 
+app.use(express.json());
 app.use(requestTrackingMiddleware);
 
-app.get('/tbt', (req, res, next) => {
-  try {
-    res.json({ message: 'Hello TBT' });
-  } catch (error) {
-    next(error);
-  }
-});
+app.use('/api', appRoutes);
 
 app.use(errorHandlingMiddleware);
 app.use(resourceNotFoundMiddleware);
